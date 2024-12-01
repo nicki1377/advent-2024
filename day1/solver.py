@@ -6,6 +6,7 @@ class Solver:
         self.list1 = []
         self.list2 = []
         self.distance = 0
+        self.frequencies = {}
     
     def parse_input(self, input_path):
         with open(input_path) as f:
@@ -22,3 +23,22 @@ class Solver:
         for a, b in zip(self.list1, self.list2):
             self.distance += abs(b - a)
         return self.distance
+
+    def __get_frequency(self, n):
+        freq = self.frequencies.get(n)
+        if freq is not None:
+            return freq
+        else:
+            occurrences = 0
+            for value in self.list2:
+                if value == n:
+                    occurrences += 1
+            self.frequencies[n] = occurrences
+            return occurrences
+
+    def similarity_score(self):
+        sum = 0
+        for value in self.list1:
+            n = value * self.__get_frequency(value)
+            sum += n
+        return sum
