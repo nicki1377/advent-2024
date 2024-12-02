@@ -23,31 +23,55 @@ std::vector<std::vector<int>> parse(std::string path) {
     return report;
 }
 
+bool isSafe(std::vector<int> report) {
+    int numLevels = report.size();
+    bool reportDescending;
+
+    if (numLevels > 1 && report[1] < report[0]) {
+        reportDescending = true;
+    }
+    else {
+        reportDescending = false;
+    }
+
+    for (int j = 1; j < numLevels; j++) {
+        int diff = abs(report[j] - report[j - 1]);
+        bool levelDescending = report[j] < report[j - 1];
+        if (levelDescending != reportDescending || diff > 3 || diff < 1) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 int countSafe(std::vector<std::vector<int>>& reports) {
     int numSafe = 0;
     int numReports = reports.size();
     for (int i = 0; i < numReports; i++) {
-        int numLevels = reports[i].size();
-        bool isSafe = true;
-        bool reportDescending;
-
-        if (numLevels > 1 && reports[i][1] < reports[i][0]) {
-            reportDescending = true;
-        }
-        else {
-            reportDescending = false;
-        }
-
-        for (int j = 1; j < numLevels; j++) {
-            int diff = abs(reports[i][j] - reports[i][j - 1]);
-            bool levelDescending = reports[i][j] < reports[i][j - 1];
-            if (levelDescending != reportDescending || diff > 3 || diff < 1) {
-                isSafe = false;
-            }
-        }
-
-        if (isSafe) {
+        if (isSafe(reports[i])) {
             numSafe++;
+        }
+    }
+    return numSafe;
+}
+
+int countSafeDampened(std::vector<std::vector<int>>& reports) {
+    int numSafe = 0;
+    int numReports = reports.size();
+    for (int i = 0; i < numReports; i++) {
+        int numLevels = reports[i].size();
+        // 'problem dampener'-
+        // try it with one level removed
+        for (int removeIndex = 0; removeIndex < numLevels; removeIndex++) {
+            
+            std::vector<int> report(reports[i]);
+            report.erase(report.begin() + removeIndex);
+
+            if (isSafe(report)) {
+                numSafe++;
+                break;
+            }
         }
     }
     return numSafe;
@@ -56,7 +80,10 @@ int countSafe(std::vector<std::vector<int>>& reports) {
 int main() {
     std::string path = "input";
     std::vector<std::vector<int>> reports = parse(path);
-    int safeReports = countSafe(reports);
+    // pt 1
+    // int safeReports = countSafe(reports);
+    // pt 2
+    int safeReports = countSafeDampened(reports);
     std::printf("%d\n", safeReports);
 
     return 0;
